@@ -335,37 +335,37 @@ impl Stretcher {
     /// linear relationship between input and output sample counts may be lost.
     ///
     /// Most applications using RealTime mode should solve this by calling
-    /// [`Self::get_preferred_start_pad`] and supplying the returned number of (silent) samples at
-    /// the start of their input, before their first "true" [`Self::process`] call; and then also
-    /// calling [`Self::get_start_delay`] and trimming the returned number of samples from the start
+    /// [`Self::preferred_start_pad`] and supplying the returned number of (silent) samples at the
+    /// start of their input, before their first "true" [`Self::process`] call; and then also
+    /// calling [`Self::start_delay`] and trimming the returned number of samples from the start
     /// of their stretcher's output.
     ///
     /// Ensure you have set the time and pitch scale factors to their proper starting values before
-    /// calling [`Self::get_preferred_start_pad`] or [`Self::get_start_delay`].
+    /// calling [`Self::preferred_start_pad`] or [`Self::start_delay`].
     ///
     /// In Offline mode, padding and delay compensation are handled internally and both functions
     /// always return zero.
-    pub fn get_preferred_start_pad(&self) -> u32 {
+    pub fn preferred_start_pad(&self) -> u32 {
         unsafe { ffi::rubberband_get_preferred_start_pad(self.as_ptr()) }
     }
 
     /// Return the output delay of the stretcher.
     ///
     /// This is the number of audio samples that one should discard at the start of the output,
-    /// after padding the start of the input with [`Self::get_preferred_start_pad`], in order to
-    /// ensure that the resulting audio has the expected time alignment with the input.
+    /// after padding the start of the input with [`Self::preferred_start_pad`], in order to ensure
+    /// that the resulting audio has the expected time alignment with the input.
     ///
     /// Ensure you have set the time and pitch scale factors to their proper starting values before
-    /// calling [`Self::get_preferred_start_pad`] or [`Self::get_start_delay`].
+    /// calling [`Self::preferred_start_pad`] or [`Self::start_delay`].
     ///
     /// In Offline mode, padding and delay compensation are handled internally and both functions
     /// always return zero.
-    pub fn get_start_delay(&self) -> u32 {
+    pub fn start_delay(&self) -> u32 {
         unsafe { ffi::rubberband_get_start_delay(self.as_ptr()) }
     }
 
     /// Return the number of channels this stretcher was constructed with.
-    pub fn get_channel_count(&self) -> u32 {
+    pub fn channel_count(&self) -> u32 {
         unsafe { ffi::rubberband_get_channel_count(self.as_ptr()) }
     }
 
@@ -374,7 +374,7 @@ impl Stretcher {
     /// This may be called at any time in RealTime mode. It may not be called in Offline mode
     /// (for which the transients option is fixed on construction). This has no effect when using
     /// the R3 engine.
-    pub fn set_transients_option(&self, options: Options) {
+    pub fn set_transients_option(&mut self, options: Options) {
         unsafe {
             ffi::rubberband_set_transients_option(self.as_ptr(), options.bits());
         }
@@ -385,7 +385,7 @@ impl Stretcher {
     /// This may be called at any time in RealTime mode. It may not be called in Offline mode (for
     /// which the detector option is fixed on construction). This has no effect when using the R3
     /// engine.
-    pub fn set_detector_option(&self, options: Options) {
+    pub fn set_detector_option(&mut self, options: Options) {
         unsafe {
             ffi::rubberband_set_detector_option(self.as_ptr(), options.bits());
         }
@@ -397,7 +397,7 @@ impl Stretcher {
     ///
     /// Note that if running multi-threaded in Offline mode, the change may not take effect
     /// immediately if processing is already under way when this function is called.
-    pub fn set_phase_option(&self, options: Options) {
+    pub fn set_phase_option(&mut self, options: Options) {
         unsafe {
             ffi::rubberband_set_phase_option(self.as_ptr(), options.bits());
         }
@@ -409,7 +409,7 @@ impl Stretcher {
     ///
     /// Note that if running multi-threaded in Offline mode, the change may not take effect
     /// immediately if processing is already under way when this function is called.
-    pub fn set_formant_option(&self, options: Options) {
+    pub fn set_formant_option(&mut self, options: Options) {
         unsafe {
             ffi::rubberband_set_formant_option(self.as_ptr(), options.bits());
         }
@@ -420,7 +420,7 @@ impl Stretcher {
     /// This may be called at any time in RealTime mode. It may not be called in Offline mode (for
     /// which the pitch option is fixed on construction). This has no effect when using the R3
     /// engine.
-    pub fn set_pitch_option(&self, options: Options) {
+    pub fn set_pitch_option(&mut self, options: Options) {
         unsafe {
             ffi::rubberband_set_pitch_option(self.as_ptr(), options.bits());
         }
@@ -436,7 +436,7 @@ impl Stretcher {
     /// multi-channel, not the number of individual samples. (For example, one second of stereo
     /// audio sampled at 44100Hz yields a value of 44100 sample frames, not 88200.) This rule
     /// applies throughout the Rubber Band API.
-    pub fn set_expected_input_duraction(&self, samples: u32) {
+    pub fn set_expected_input_duraction(&mut self, samples: u32) {
         unsafe {
             ffi::rubberband_set_expected_input_duration(self.as_ptr(), samples);
         }
@@ -446,14 +446,14 @@ impl Stretcher {
     /// single [`Self::process`] call.
     ///
     /// If you don't call this, the stretcher will assume that you are calling
-    /// [`Self::get_samples_required`] at each cycle and are never passing more samples than are
+    /// [`Self::samples_required`] at each cycle and are never passing more samples than are
     /// suggested by that function.
     ///
     /// If your application has some external constraint that means you prefer a fixed block size,
     /// then your normal mode of operation would be to provide that block size to this function; to
     /// loop calling [`Self::process`] with that size of block; after each call to
     /// [`Self::process`], test whether output has been generated by calling [`Self::available`];
-    /// and, if so, call [`Self::retrieve`] to obtain it. See [`Self::get_samples_required`] for a
+    /// and, if so, call [`Self::retrieve`] to obtain it. See [`Self::samples_required`] for a
     /// more suitable operating mode for applications without such external constraints.
     ///
     /// This function may not be called after the first call to [`Self::study`] or [`Self::process`].
@@ -463,14 +463,14 @@ impl Stretcher {
     ///
     /// Despite the existence of this call and its use of a `u32` argument, there is an internal
     /// limit to the maximum process buffer size that can be requested. Call
-    /// [`Self::get_process_size_limit`] to query that limit. The Rubber Band API is essentially
+    /// [`Self::process_size_limit`] to query that limit. The Rubber Band API is essentially
     /// block-based and is not designed to process an entire signal within a single process cycle.
     ///
     /// Note that the value of `samples` refers to the number of audio sample frames, which may be
     /// multi-channel, not the number of individual samples. (For example, one second of stereo
     /// audio sampled at 44100Hz yields a value of 44100 sample frames, not 88200.) This rule
     /// applies throughout the Rubber Band API.
-    pub fn set_max_process_size(&self, samples: u32) {
+    pub fn set_max_process_size(&mut self, samples: u32) {
         unsafe { ffi::rubberband_set_max_process_size(self.as_ptr(), samples) }
     }
 
@@ -479,7 +479,7 @@ impl Stretcher {
     ///
     /// This value is fixed across instances and configurations. As of Rubber Band v3.3 it is always
     /// 524288 (or 2^19), but in principle it may change in future releases.
-    pub fn get_process_size_limit(&self) -> u32 {
+    pub fn process_size_limit(&self) -> u32 {
         unsafe { ffi::rubberband_get_process_size_limit(self.as_ptr()) }
     }
 
@@ -500,7 +500,7 @@ impl Stretcher {
     /// multi-channel, not the number of individual samples. (For example, one second of stereo
     /// audio sampled at 44100Hz yields a value of 44100 sample frames, not 88200.) This rule
     /// applies throughout the Rubber Band API.
-    pub fn get_samples_required(&self) -> u32 {
+    pub fn samples_required(&self) -> u32 {
         unsafe { ffi::rubberband_get_samples_required(self.as_ptr()) }
     }
 
@@ -523,7 +523,7 @@ impl Stretcher {
     /// material's duration). You need to provide this ratio separately to [`Self::set_time_ratio`],
     /// otherwise the results may be truncated or extended in unexpected ways regardless of the
     /// extent of the frame numbers found in the key frame map.
-    pub fn set_key_frame_map(&self, map: HashMap<u32, u32>) {
+    pub fn set_key_frame_map(&mut self, map: HashMap<u32, u32>) {
         unsafe {
             ffi::rubberband_set_key_frame_map(
                 self.as_ptr(),
@@ -546,7 +546,7 @@ impl Stretcher {
     ///
     /// Set `is_final` to true if this is the last block of data that will be provided to
     /// [`Self::study`] before the first [`Self::process`] call.
-    pub fn study(&self, input: &[&[f32]], is_final: bool) {
+    pub fn study(&mut self, input: &[&[f32]], is_final: bool) {
         let num_samples = input.iter().map(|s| s.len()).min().unwrap_or(0);
         let input = input.iter().map(|slice| slice.as_ptr()).collect::<Vec<_>>();
         unsafe {
@@ -561,13 +561,13 @@ impl Stretcher {
 
     /// Provide a block of sample frames for processing.
     ///
-    /// See also [`Self::get_samples_required`] and [`Self::set_max_process_size`].
+    /// See also [`Self::samples_required`] and [`Self::set_max_process_size`].
     ///
     /// `input` should point to de-interleaved audio data with one float array per channel. Sample
     /// values are conventionally expected to be in the range -1.0f to +1.0f.
     ///
     /// Set `is_final` to true if this is the last block of input data.
-    pub fn process(&self, input: &[&[f32]], is_final: bool) {
+    pub fn process(&mut self, input: &[&[f32]], is_final: bool) {
         let num_samples = input.iter().map(|s| s.len()).min().unwrap_or(0);
         let input = input.iter().map(|slice| slice.as_ptr()).collect::<Vec<_>>();
         unsafe {
@@ -585,8 +585,8 @@ impl Stretcher {
     ///
     /// This function returns 0 if no frames are available: this usually means more input data needs
     /// to be provided, but if the stretcher is running in threaded mode it may just mean that not
-    /// enough data has yet been processed. Call [`Self::get_samples_required`] to discover whether
-    /// more input is needed.
+    /// enough data has yet been processed. Call [`Self::samples_required`] to discover whether more
+    /// input is needed.
     ///
     /// Note that the return value refers to the number of audio sample frames, which may be
     /// multi-channel, not the number of individual samples. (For example, one second of stereo
@@ -612,7 +612,7 @@ impl Stretcher {
     /// multi-channel, not the number of individual samples. (For example, one second of stereo
     /// audio sampled at 44100Hz yields a value of 44100 sample frames, not 88200.) This rule
     /// applies throughout the Rubber Band API.
-    pub fn retrieve(&self, output: &mut [&mut [f32]]) -> u32 {
+    pub fn retrieve(&mut self, output: &mut [&mut [f32]]) -> u32 {
         let num_samples = output.iter().map(|s| s.len()).min().unwrap_or(0);
         let output = output
             .iter_mut()
@@ -633,7 +633,7 @@ impl Stretcher {
     ///
     /// This function is provided for diagnostic purposes only and is supported only with the R2
     /// engine.
-    pub fn calculate_stretch(&self) {
+    pub fn calculate_stretch(&mut self) {
         unsafe {
             ffi::rubberband_calculate_stretch(self.as_ptr());
         }
@@ -650,7 +650,7 @@ impl Stretcher {
     /// constants as debug messages, so they are RT-safe if your custom logger is RT-safe.
     /// Levels [`DebugLevel::Info`] and [`DebugLevel::Verbose`] are not guaranteed to be RT-safe in
     /// any conditions as they may construct messages by allocation.
-    pub fn set_debug_level(&self, level: DebugLevel) {
+    pub fn set_debug_level(&mut self, level: DebugLevel) {
         unsafe {
             ffi::rubberband_set_debug_level(self.as_ptr(), level as i32);
         }

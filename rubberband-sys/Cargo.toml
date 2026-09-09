@@ -1,0 +1,11 @@
+[package]
+name = "rubberband-sys"
+version = "0.1.2"
+edition.workspace = true
+description.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[build-dependencies]
+bindgen = "0.71.0"
+cc = "1.4.5"

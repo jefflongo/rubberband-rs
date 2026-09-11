@@ -6,6 +6,7 @@ fn main() {
     build
         .cpp(true)
         .flag_if_supported("-std=c++11")
+        .flag_if_supported("-Wno-unused-parameter")
         .file("rubberband/single/RubberBandSingle.cpp");
     println!("cargo:rerun-if-changed=rubberband/single/RubberBandSingle.cpp");
 

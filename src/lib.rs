@@ -26,115 +26,139 @@ bitflags::bitflags! {
     /// option flags. The default value ([`Self::default`]) is intended to give good results in most
     /// situations.
     #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-    pub struct Options: i32 {
+    pub struct Options: u32 {
+        #[allow(clippy::unnecessary_cast)]
         /// Run the stretcher in offline mode. In this mode the input data needs to be provided
         /// twice, once to [`Stretcher::study`], which calculates a stretch profile for the audio,
         /// and once to [`Stretcher::process`], which stretches it.
-        const PROCESS_OFFLINE = ffi::RubberBandOption_RubberBandOptionProcessOffline;
+        const PROCESS_OFFLINE = ffi::RubberBandOption_RubberBandOptionProcessOffline as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Run the stretcher in real-time mode. In this mode only [`Stretcher::process`] should be
         /// called, and the stretcher adjusts dynamically in response to the input audio.
-        const PROCESS_REALTIME = ffi::RubberBandOption_RubberBandOptionProcessRealTime;
+        const PROCESS_REALTIME = ffi::RubberBandOption_RubberBandOptionProcessRealTime as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Reset component phases at the peak of each transient (the start of a significant note or
         /// percussive event). This, the default setting, usually results in a clear-sounding
         /// output; but it is not always consistent, and may cause interruptions in stable sounds
         /// present at the same time as transient events. The DETECTOR flags (below) can be used to
         /// tune this to some extent.
-        const TRANSIENTS_CRISP = ffi::RubberBandOption_RubberBandOptionTransientsCrisp;
+        const TRANSIENTS_CRISP = ffi::RubberBandOption_RubberBandOptionTransientsCrisp as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Reset component phases at the peak of each transient, outside a frequency range typical
         /// of musical fundamental frequencies. The results may be more regular for mixed stable and
         /// percussive notes than [`Self::TRANSIENTS_CRISP`], but with a "phasier" sound. The
         /// balance may sound very good for certain types of music and fairly bad for others.
-        const TRANSIENTS_MIXED = ffi::RubberBandOption_RubberBandOptionTransientsMixed;
+        const TRANSIENTS_MIXED = ffi::RubberBandOption_RubberBandOptionTransientsMixed as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Do not reset component phases at any point. The results will be smoother and more
         /// regular but may be less clear than with either of the other transients flags.
-        const TRANSIENTS_SMOOTH = ffi::RubberBandOption_RubberBandOptionTransientsSmooth;
+        const TRANSIENTS_SMOOTH = ffi::RubberBandOption_RubberBandOptionTransientsSmooth as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Use a general-purpose transient detector which is likely to be good for most situations.
         /// This is the default.
-        const DETECTOR_COMPOUND = ffi::RubberBandOption_RubberBandOptionDetectorCompound;
+        const DETECTOR_COMPOUND = ffi::RubberBandOption_RubberBandOptionDetectorCompound as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Detect percussive transients. Note that this was the default and only option in Rubber
         /// Band versions prior to 1.5.
-        const DETECTOR_PERCUSSIVE = ffi::RubberBandOption_RubberBandOptionDetectorPercussive;
+        const DETECTOR_PERCUSSIVE = ffi::RubberBandOption_RubberBandOptionDetectorPercussive as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Use an onset detector with less of a bias toward percussive transients. This may give
         /// better results with certain material (e.g. relatively monophonic piano music).
-        const DETECTOR_SOFT = ffi::RubberBandOption_RubberBandOptionDetectorSoft;
+        const DETECTOR_SOFT = ffi::RubberBandOption_RubberBandOptionDetectorSoft as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Adjust phases when stretching in such a way as to try to retain the continuity of phase
         /// relationships between adjacent frequency bins whose phases are behaving in similar ways.
         /// This, the default setting, should give good results in most situations.
-        const PHASE_LAMINAR = ffi::RubberBandOption_RubberBandOptionPhaseLaminar;
+        const PHASE_LAMINAR = ffi::RubberBandOption_RubberBandOptionPhaseLaminar as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Adjust the phase in each frequency bin independently from its neighbours. This usually
         /// results in a slightly softer, phasier sound.
-        const PHASE_INDEPENDENT = ffi::RubberBandOption_RubberBandOptionPhaseIndependent;
+        const PHASE_INDEPENDENT = ffi::RubberBandOption_RubberBandOptionPhaseIndependent as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Permit the stretcher to determine its own threading model. In the R2 engine this means
         /// using one processing thread per audio channel in offline mode if the stretcher is able
         /// to determine that more than one CPU is available, and one thread only in realtime mode.
         /// The R3 engine does not currently have a multi-threaded mode, but if one is introduced in
         /// future, this option may use it. This is the default.
-        const THREADING_AUTO = ffi::RubberBandOption_RubberBandOptionThreadingAuto;
+        const THREADING_AUTO = ffi::RubberBandOption_RubberBandOptionThreadingAuto as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Never use more than one thread.
-        const THREADING_NEVER = ffi::RubberBandOption_RubberBandOptionThreadingNever;
+        const THREADING_NEVER = ffi::RubberBandOption_RubberBandOptionThreadingNever as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Use multiple threads in any situation where OptionThreadingAuto would do so, except omit
         /// the check for multiple CPUs and instead assume it to be true.
-        const THREADING_ALWAYS = ffi::RubberBandOption_RubberBandOptionThreadingAlways;
+        const THREADING_ALWAYS = ffi::RubberBandOption_RubberBandOptionThreadingAlways as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Use the default window size. The actual size will vary depending on other parameters.
         /// This option is expected to produce better results than the other window options in most
         /// situations. In the R3 engine this causes the engine's full multi-resolution processing
         /// scheme to be used.
-        const WINDOW_STANDARD = ffi::RubberBandOption_RubberBandOptionWindowStandard;
+        const WINDOW_STANDARD = ffi::RubberBandOption_RubberBandOptionWindowStandard as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Use a shorter window. This has different effects with R2 and R3 engines.
-        const WINDOW_SHORT = ffi::RubberBandOption_RubberBandOptionWindowShort;
+        const WINDOW_SHORT = ffi::RubberBandOption_RubberBandOptionWindowShort as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Use a longer window. With the R2 engine this is likely to result in a smoother sound at
         /// the expense of clarity and timing. The R3 engine currently ignores this option, treating
         /// it like [`Self::WINDOW_STANDARD`].
-        const WINDOW_LONG = ffi::RubberBandOption_RubberBandOptionWindowLong;
+        const WINDOW_LONG = ffi::RubberBandOption_RubberBandOptionWindowLong as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Do not use time-domain smoothing. This is the default.
-        const SMOOTHING_OFF = ffi::RubberBandOption_RubberBandOptionSmoothingOff;
+        const SMOOTHING_OFF = ffi::RubberBandOption_RubberBandOptionSmoothingOff as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Use time-domain smoothing. This will result in a softer sound with some audible
         /// artifacts around sharp transients, but it may be appropriate for longer stretches of
         /// some instruments and can mix well with [`Self::WINDOW_SHORT`].
-        const SMOOTHING_ON = ffi::RubberBandOption_RubberBandOptionSmoothingOn;
+        const SMOOTHING_ON = ffi::RubberBandOption_RubberBandOptionSmoothingOn as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Apply no special formant processing. The spectral envelope will be pitch shifted as
         /// normal. This is the default.
-        const FORMANT_SHIFTED = ffi::RubberBandOption_RubberBandOptionFormantShifted;
+        const FORMANT_SHIFTED = ffi::RubberBandOption_RubberBandOptionFormantShifted as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Preserve the spectral envelope of the unshifted signal. This permits shifting the note
         /// frequency without so substantially affecting the perceived pitch profile of the voice or
         /// instrument.
-        const FORMANT_PRESERVED = ffi::RubberBandOption_RubberBandOptionFormantPreserved;
+        const FORMANT_PRESERVED = ffi::RubberBandOption_RubberBandOptionFormantPreserved as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Favour CPU cost over sound quality. This is the default. Use this when time-stretching
         /// only, or for fixed pitch shifts where CPU usage is of concern. Do not use this for
         /// arbitrarily time-varying pitch shifts (see [`Self::PITCH_HIGH_CONSISTENCY`] below).
-        const PITCH_HIGH_SPEED = ffi::RubberBandOption_RubberBandOptionPitchHighSpeed;
+        const PITCH_HIGH_SPEED = ffi::RubberBandOption_RubberBandOptionPitchHighSpeed as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Favour sound quality over CPU cost. Use this for fixed pitch shifts where sound quality
         /// is of most concern. Do not use this for arbitrarily time-varying pitch shifts (see
         /// [`Self::PITCH_HIGH_CONSISTENCY`] below).
-        const PITCH_HIGH_QUALITY = ffi::RubberBandOption_RubberBandOptionPitchHighQuality;
+        const PITCH_HIGH_QUALITY = ffi::RubberBandOption_RubberBandOptionPitchHighQuality as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Use a method that supports dynamic pitch changes without discontinuities, including when
         /// crossing the 1.0 pitch scale. This may cost more in CPU than the default, especially
         /// when the pitch scale is exactly 1.0. You should use this option whenever you wish to
         /// support dynamically changing pitch shift during processing.
-        const PITCH_HIGH_CONSISTENCY = ffi::RubberBandOption_RubberBandOptionPitchHighConsistency;
+        const PITCH_HIGH_CONSISTENCY = ffi::RubberBandOption_RubberBandOptionPitchHighConsistency as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Channels are handled for maximum individual fidelity, at the expense of synchronisation.
         /// In the R3 engine, this means frequency-bin synchronisation is maintained more closely
         /// for lower-frequency content than higher. In R2, it means the stereo channels are
@@ -142,28 +166,31 @@ bitflags::bitflags! {
         /// the highest quality for the individual channels but a more diffuse stereo image, an
         /// unnatural increase in "width", and generally a loss of mono compatibility (i.e. mono
         /// mixes from stereo can sound phasy). This option is the default.
-        const CHANNELS_APART = ffi::RubberBandOption_RubberBandOptionChannelsApart;
+        const CHANNELS_APART = ffi::RubberBandOption_RubberBandOptionChannelsApart as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Channels are handled for higher synchronisation at some expense of individual fidelity.
         /// In particular, a stretcher processing two channels will treat its input as a stereo pair
         /// and aim to maximise clarity at the centre and preserve mono compatibility. This gives
         /// relatively less stereo space and width than the default, as well as slightly lower
         /// fidelity for individual channel content, but the results may be more appropriate for
         /// many situations making use of stereo mixes.
-        const CHANNELS_TOGETHER = ffi::RubberBandOption_RubberBandOptionChannelsTogether;
+        const CHANNELS_TOGETHER = ffi::RubberBandOption_RubberBandOptionChannelsTogether as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Use the Rubber Band Library R2 (Faster) engine. This is the engine implemented in Rubber
         /// Band Library v1.x and v2.x, and it remains the default in newer versions. It uses
         /// substantially less CPU than the R3 engine and there are still many situations in which
         /// it is likely to be the more appropriate choice.
-        const ENGINE_FASTER = ffi::RubberBandOption_RubberBandOptionEngineFaster;
+        const ENGINE_FASTER = ffi::RubberBandOption_RubberBandOptionEngineFaster as u32;
 
+        #[allow(clippy::unnecessary_cast)]
         /// Use the Rubber Band Library R3 (Finer) engine. This engine was introduced in Rubber Band
         /// Library v3.0. It produces higher-quality results than the R2 engine for most material,
         /// especially complex mixes, vocals and other sounds that have soft onsets and smooth pitch
         /// changes, and music with substantial bass content. However, it uses much more CPU power
         /// than the R2 engine.
-        const ENGINE_FINER = ffi::RubberBandOption_RubberBandOptionEngineFiner;
+        const ENGINE_FINER = ffi::RubberBandOption_RubberBandOptionEngineFiner as u32;
     }
 }
 
@@ -205,7 +232,7 @@ impl Stretcher {
             ffi::rubberband_new(
                 sample_rate,
                 channels,
-                options.bits(),
+                options.bits() as i32,
                 initial_time_ratio,
                 initial_pitch_scale,
             )
@@ -376,7 +403,7 @@ impl Stretcher {
     /// the R3 engine.
     pub fn set_transients_option(&mut self, options: Options) {
         unsafe {
-            ffi::rubberband_set_transients_option(self.as_ptr(), options.bits());
+            ffi::rubberband_set_transients_option(self.as_ptr(), options.bits() as i32);
         }
     }
 
@@ -387,7 +414,7 @@ impl Stretcher {
     /// engine.
     pub fn set_detector_option(&mut self, options: Options) {
         unsafe {
-            ffi::rubberband_set_detector_option(self.as_ptr(), options.bits());
+            ffi::rubberband_set_detector_option(self.as_ptr(), options.bits() as i32);
         }
     }
 
@@ -399,7 +426,7 @@ impl Stretcher {
     /// immediately if processing is already under way when this function is called.
     pub fn set_phase_option(&mut self, options: Options) {
         unsafe {
-            ffi::rubberband_set_phase_option(self.as_ptr(), options.bits());
+            ffi::rubberband_set_phase_option(self.as_ptr(), options.bits() as i32);
         }
     }
 
@@ -411,7 +438,7 @@ impl Stretcher {
     /// immediately if processing is already under way when this function is called.
     pub fn set_formant_option(&mut self, options: Options) {
         unsafe {
-            ffi::rubberband_set_formant_option(self.as_ptr(), options.bits());
+            ffi::rubberband_set_formant_option(self.as_ptr(), options.bits() as i32);
         }
     }
 
@@ -422,7 +449,7 @@ impl Stretcher {
     /// engine.
     pub fn set_pitch_option(&mut self, options: Options) {
         unsafe {
-            ffi::rubberband_set_pitch_option(self.as_ptr(), options.bits());
+            ffi::rubberband_set_pitch_option(self.as_ptr(), options.bits() as i32);
         }
     }
 
